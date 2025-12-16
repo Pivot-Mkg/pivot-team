@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Project Team Directory</title>
+  <style>
+    /* --- CSS Reset & Variables --- */
+    :root {
+      /* Brand Core - Adapted for Light Mode */
+      --brand-primary: #0A4C8A;
+      /* Deep sapphire blue */
+      --brand-secondary: #0284c7;
+      /* Rich sky blue */
+      --brand-accent: #0369a1;
+      /* Darker blue for text contrast */
+      --brand-highlight: #35C6FF;
+      /* Bright cyan for glows/accents */
+
+      /* Backgrounds - LIGHT MODE */
+      --bg-main: #f8fafc;
+      /* Very light slate background */
+      --bg-surface: #ffffff;
+      /* White cards */
+      --bg-elevated: #f0f9ff;
+      /* Very light blue tint for hover */
+
+      /* Borders & Dividers */
+      --border-subtle: #e2e8f0;
+      /* Light gray border */
+      --border-active: #38bdf8;
+      /* Bright blue active border */
+
+      /* Text - DARK ON LIGHT */
+      --text-primary: #0f172a;
+      /* Dark slate for headings */
+      --text-secondary: #334155;
+      /* Slate for body text */
+      --text-muted: #64748b;
+      /* Muted slate for metadata */
+
+      /* States */
+      --state-hover: #e0f2fe;
+      --state-focus: #0ea5e9;
+
+      /* Gradients */
+      --gradient-brand: linear-gradient(135deg,
+          #0A4C8A 0%,
+          #0284c7 100%);
+
+      /* Shadows / Glow - Softened for Light Mode */
+      --glow-accent: 0 10px 25px -5px rgba(14, 165, 233, 0.25);
+      --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+
+      --font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      --transition-curve: cubic-bezier(0.2, 0.8, 0.2, 1);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    body {
+      font-family: var(--font-family);
+      background-color: var(--bg-main);
+      color: var(--text-primary);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 40px 20px;
+      position: relative;
+      overflow-x: hidden;
+      /* Prevent scrollbar from animation overflow */
+    }
+
+    /* --- Background Animation --- */
+    body::before,
+    body::after {
+      content: '';
+      position: fixed;
+      width: 80vw;
+      /* Large blobs relative to viewport */
+      height: 80vw;
+      border-radius: 50%;
+      z-index: -1;
+      pointer-events: none;
+    }
+
+    body::before {
+      top: -20%;
+      left: -20%;
+      background: radial-gradient(circle, rgba(14, 165, 233, 0.05) 0%, transparent 60%);
+      animation: floatShape 25s infinite alternate ease-in-out;
+    }
+
+    body::after {
+      bottom: -20%;
+      right: -20%;
+      background: radial-gradient(circle, rgba(10, 76, 138, 0.03) 0%, transparent 60%);
+      animation: floatShape 30s infinite alternate-reverse ease-in-out;
+    }
+
+    @keyframes floatShape {
+      0% {
+        transform: translate(0, 0) scale(1);
+      }
+
+      100% {
+        transform: translate(5%, 5%) scale(1.1);
+      }
+    }
+
+    /* --- Header Section --- */
+    header {
+      text-align: center;
+      margin-bottom: 40px;
+      animation: fadeInDown 0.8s var(--transition-curve);
+    }
+
+    h1 {
+      font-size: 2.5rem;
+      font-weight: 800;
+      letter-spacing: -0.05em;
+      background: var(--gradient-brand);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 8px;
+    }
+
+    .subtitle {
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+
+    /* --- Tabs Navigation --- */
+    .tabs-container {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      background: var(--bg-surface);
+      padding: 6px;
+      border-radius: 16px;
+      box-shadow: var(--card-shadow);
+      margin-bottom: 40px;
+      animation: fadeIn 1s var(--transition-curve) 0.2s backwards;
+      flex-wrap: wrap;
+      border: 1px solid var(--border-subtle);
+    }
+
+    .tab-btn {
+      padding: 10px 24px;
+      border: none;
+      background: transparent;
+      font-family: var(--font-family);
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+      cursor: pointer;
+      border-radius: 10px;
+      transition: all 0.3s var(--transition-curve);
+      position: relative;
+      outline: none;
+    }
+
+    .tab-btn:hover {
+      color: var(--text-primary);
+      background: var(--bg-main);
+    }
+
+    .tab-btn.active {
+      color: white;
+      background: var(--gradient-brand);
+      box-shadow: 0 4px 12px rgba(2, 132, 199, 0.25);
+    }
+
+    /* --- Grid Layout --- */
+    #content-area {
+      width: 100%;
+      max-width: 1200px;
+      min-height: 400px;
+      /* Prevent layout shift */
+    }
+
+    .team-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 24px;
+      width: 100%;
+      align-items: start;
+      /* Prevents cards from stretching to match row height */
+    }
+
+    /* --- Card Styling --- */
+    .card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: 20px;
+      padding: 24px;
+      box-shadow: var(--card-shadow);
+      transition: all 0.4s var(--transition-curve);
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+      opacity: 0;
+      /* Handled by animation */
+      transform: translateY(20px);
+      /* height: 100%; */
+    }
+
+    .card:hover {
+      transform: translateY(-5px) scale(1.01);
+      box-shadow: var(--glow-accent);
+      border-color: var(--border-active);
+      background: var(--bg-surface);
+      /* Keep white but lift */
+    }
+
+    /* Animated Entrance */
+    .card.enter {
+      animation: cardEntrance 0.6s var(--transition-curve) forwards;
+    }
+
+    /* Card Content */
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 12px;
+    }
+
+    .role-badge {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      font-weight: 700;
+      color: var(--brand-accent);
+      background: rgba(14, 165, 233, 0.1);
+      padding: 6px 12px;
+      border-radius: 20px;
+      border: 1px solid rgba(14, 165, 233, 0.2);
+    }
+
+    .person-name {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 4px;
+      letter-spacing: -0.02em;
+    }
+
+    .education {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      line-height: 1.4;
+      margin-bottom: 20px;
+    }
+
+    /* Details (Responsibilities) */
+    .details-wrapper {
+      display: grid;
+      grid-template-rows: 0fr;
+      transition: grid-template-rows 0.4s var(--transition-curve);
+    }
+
+    .details-wrapper.open {
+      grid-template-rows: 1fr;
+    }
+
+    .details-inner {
+      overflow: hidden;
+    }
+
+    .details-list {
+      list-style: none;
+      padding-top: 16px;
+      border-top: 1px solid var(--border-subtle);
+    }
+
+    .details-list li {
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+      margin-bottom: 8px;
+      padding-left: 20px;
+      position: relative;
+    }
+
+    .details-list li::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 8px;
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background-color: var(--brand-highlight);
+      box-shadow: 0 0 4px var(--brand-highlight);
+    }
+
+    /* Toggle Hint */
+    .card-footer {
+      margin-top: 12px;
+      display: flex;
+      justify-content: flex-end;
+    }
+
+    .toggle-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: var(--bg-main);
+      color: var(--text-muted);
+      border: 1px solid var(--border-subtle);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.3s var(--transition-curve), background 0.3s, color 0.3s, border-color 0.3s;
+      flex-shrink: 0;
+    }
+
+    .toggle-icon svg {
+      width: 18px;
+      height: 18px;
+      display: block;
+    }
+
+    .card:hover .toggle-icon {
+      background: var(--brand-secondary);
+      color: white;
+      border-color: var(--brand-secondary);
+    }
+
+    .card.expanded .toggle-icon {
+      transform: rotate(45deg);
+      background: var(--brand-primary);
+      color: white;
+      border-color: var(--brand-primary);
+    }
+
+
+    /* --- Animations --- */
+    @keyframes fadeInDown {
+      from {
+        opacity: 0;
+        transform: translateY(-20px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+      }
+
+      to {
+        opacity: 1;
+      }
+    }
+
+    @keyframes cardEntrance {
+      from {
+        opacity: 0;
+        transform: translateY(30px) scale(0.95);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    /* Mobile Adjustments */
+    @media (max-width: 600px) {
+      h1 {
+        font-size: 1.8rem;
+      }
+
+      .tabs-container {
+        width: 100%;
+        overflow-x: auto;
+        justify-content: flex-start;
+      }
+
+      .tab-btn {
+        white-space: nowrap;
+        flex-shrink: 0;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <header>
+    <h1>Project Team</h1>
+    <div class="subtitle">Structure & Responsibilities</div>
+  </header>
+
+  <nav class="tabs-container" id="tabs-nav">
+    <!-- Tabs generated by JS -->
+  </nav>
+
+  <main id="content-area">
+    <!-- Grid generated by JS -->
+  </main>
+
+  <script>
+    // --- Data ---
+    const rawData = {
+      "project_team": {
+        "account_planning": [
+          {
+            "role": "Lead Account Planner",
+            "name": "Siddhesh Patil",
+            "education": "MBA, D.Y. Patil School of Management",
+            "responsibilities": [
+              "Oversees project alignment",
+              "Stakeholder coordination",
+              "Timelines management",
+              "Delivery governance"
+            ]
+          },
+          {
+            "role": "Content Manager",
+            "name": "Isha Surpur",
+            "education": "MA Journalism and Media Communications, University of Hertfordshire, United Kingdom",
+            "responsibilities": [
+              "Content strategy execution",
+              "Media communications",
+              "Editorial governance"
+            ]
+          }
+        ],
+        "ui_ux_team": [
+          {
+            "role": "Art Director",
+            "name": "Aditya Dahiwadkar",
+            "education": "Master’s in Design, National Institute of Design, Ahmedabad",
+            "responsibilities": [
+              "Drives UX structure",
+              "Layout systems",
+              "Design consistency",
+              "Design quality across all assets"
+            ]
+          },
+          {
+            "role": "Principal Designer",
+            "name": "Kumar Shetty",
+            "education": "Bachelor’s in Design, L.S. Raheja School of Art, Mumbai",
+            "responsibilities": [
+              "Leads visual direction",
+              "Brand interpretation",
+              "Design quality"
+            ]
+          },
+          {
+            "role": "Senior Designer",
+            "name": "Meghana Samantha",
+            "education": "Bachelor’s in Design, NIFT, Bhubaneswar",
+            "responsibilities": [
+              "Detailed UI execution",
+              "Visual refinement"
+            ]
+          },
+          {
+            "role": "Designer",
+            "name": "Esther Haokip",
+            "education": "Bachelor’s in Design, NIFT, Chennai",
+            "responsibilities": [
+              "Supports interface design",
+              "Components",
+              "Visual assets"
+            ]
+          }
+        ],
+        "technology_team": [
+          {
+            "role": "Technical Lead",
+            "name": "Aakash Mishra",
+            "education": "B.Sc. Computer Science, Bhavan’s College, Mumbai",
+            "responsibilities": [
+              "Architects the technical framework",
+              "Oversees development execution",
+              "Performance optimization"
+            ]
+          },
+          {
+            "role": "Web Developer",
+            "name": "Harsh Vishwakarma",
+            "education": "MCA, YCMOU, Nashik",
+            "responsibilities": [
+              "Front-end development",
+              "Functional implementation"
+            ]
+          },
+          {
+            "role": "Web Developer",
+            "name": "Shweta Lad",
+            "education": "B.Sc. IT, Sathaye College, Mumbai",
+            "responsibilities": [
+              "Supports development",
+              "Integrations"
+            ]
+          }
+        ]
+      }
+    };
+
+    // --- Controller & State ---
+    const app = {
+      data: {},
+      tabs: [
+        { id: 'all', label: 'All Teams', key: 'all' },
+        { id: 'ap', label: 'Account Planning', key: 'account_planning' },
+        { id: 'ui', label: 'UI/UX Design Team', key: 'ui_ux_team' },
+        { id: 'tech', label: 'Technology Team', key: 'technology_team' }
+      ],
+      activeTab: 'all', // Default tab
+
+      init() {
+        this.normalizeData();
+        this.renderTabs();
+        this.renderGrid(this.activeTab);
+      },
+
+      // Convert varied JSON structures into a consistent array per team
+      normalizeData() {
+        const pt = rawData.project_team;
+
+        // Account Planning - Now matches the array format of other teams
+        this.data.account_planning = pt.account_planning;
+
+        // UI/UX (Already Array)
+        this.data.ui_ux_team = pt.ui_ux_team;
+
+        // Tech (Already Array)
+        this.data.technology_team = pt.technology_team;
+      },
+
+      renderTabs() {
+        const nav = document.getElementById('tabs-nav');
+        nav.innerHTML = '';
+
+        this.tabs.forEach(tab => {
+          const btn = document.createElement('button');
+          btn.className = `tab-btn ${tab.id === this.activeTab ? 'active' : ''}`;
+          btn.textContent = tab.label;
+          btn.onclick = () => this.switchTab(tab.id);
+          nav.appendChild(btn);
+        });
+      },
+
+      switchTab(tabId) {
+        if (this.activeTab === tabId) return;
+        this.activeTab = tabId;
+
+        // Update UI Buttons
+        const buttons = document.querySelectorAll('.tab-btn');
+        buttons.forEach((btn, idx) => {
+          if (this.tabs[idx].id === tabId) btn.classList.add('active');
+          else btn.classList.remove('active');
+        });
+
+        // Render content
+        this.renderGrid(tabId);
+      },
+
+      renderGrid(tabId) {
+        const container = document.getElementById('content-area');
+        const tabKey = this.tabs.find(t => t.id === tabId).key;
+
+        let teamMembers;
+        if (tabKey === 'all') {
+          teamMembers = Object.values(this.data).flat();
+        } else {
+          teamMembers = this.data[tabKey];
+        }
+
+        // Clean previous content
+        container.innerHTML = '';
+
+        const grid = document.createElement('div');
+        grid.className = 'team-grid';
+
+        teamMembers.forEach((member, index) => {
+          const card = this.createCard(member, index);
+          grid.appendChild(card);
+        });
+
+        container.appendChild(grid);
+      },
+
+      createCard(member, index) {
+        const card = document.createElement('div');
+        card.className = 'card';
+        // Staggered animation delay
+        card.style.animationDelay = `${index * 0.1}s`;
+        card.classList.add('enter');
+
+        // Create inner HTML
+        card.innerHTML = `
+                    <div class="card-header">
+                        <span class="role-badge">${member.role}</span>
+                        <div class="toggle-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                <line x1="12" y1="5" x2="12" y2="19"></line>
+                                <line x1="5" y1="12" x2="19" y2="12"></line>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="person-name">${member.name}</div>
+                    <div class="education">${member.education}</div>
+                    
+                    <div class="details-wrapper">
+                        <div class="details-inner">
+                            <ul class="details-list">
+                                ${member.responsibilities.map(r => `<li>${r}</li>`).join('')}
+                            </ul>
+                        </div>
+                    </div>
+                `;
+
+        // Interactive Click
+        card.onclick = () => {
+          const wrapper = card.querySelector('.details-wrapper');
+          const isClosed = !wrapper.classList.contains('open');
+
+          if (isClosed) {
+            wrapper.classList.add('open');
+            card.classList.add('expanded');
+          } else {
+            wrapper.classList.remove('open');
+            card.classList.remove('expanded');
+          }
+        };
+
+        return card;
+      }
+    };
+
+    // Initialize App
+    document.addEventListener('DOMContentLoaded', () => {
+      app.init();
+    });
+
+  </script>
+</body>
+
+</html>
